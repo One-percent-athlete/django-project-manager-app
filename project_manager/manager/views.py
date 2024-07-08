@@ -2,22 +2,24 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.views.generic import ListView
-
+from django.contrib.auth.decorators import login_required
 
 from .models import Project, Task
 from .forms import TaskForm
 
-
 def home(request):
-    return render(request, 'home.html')
+    tasks = Task.objects.all()
 
+    return render(request, 'home.html', {'tasks': tasks})
+
+@login_required()
 def projects(request):
     projects = Project.objects.all()
 
     context = {'projects':projects}
     return render(request, 'projects.html', context)
 
-
+@login_required()
 def project_details(request, pk):
    project = get_object_or_404(Project, id=pk)
    project_tasks = project.task_set.all()
@@ -25,6 +27,7 @@ def project_details(request, pk):
    context = {'project':project,'project_tasks': project_tasks}
    return render(request, 'project-details.html', context)
 
+@login_required()
 def tasks(request):
     user_tasks =Task.objects.filter(assignee=request.user)
     tasks = Task.objects.filter(assignee=None)
@@ -32,12 +35,13 @@ def tasks(request):
     context = {'tasks':tasks,'user_tasks':user_tasks}
     return render(request, 'tasks.html',context)
 
+@login_required()
 def task_details(request,pk):
     task = get_object_or_404(Task, id=pk)
     context = {'task':task}
     return render(request, 'task-details.html',context)
 
-
+@login_required()
 def create_task(request):
     if request.method == "POST":
        form =TaskForm(request.POST)
@@ -48,14 +52,13 @@ def create_task(request):
         form = TaskForm
         return render(request, 'create-task.html', {'form': form})
     
+@login_required()
 def joinTask(request,pk):
    task =Task.objects.get(id=pk)
    task.assignee=request.user
    task.save()
    return redirect('tasks')
     
-
-
 class TaskListView(ListView):
    model = Task
    template_name = 'tasks.html'
@@ -82,7 +85,7 @@ class TaskDeleteView(DeleteView):
     model = Task
     template_name = 'delete-task.html'
     success_url = reverse_lazy('tasks')
- 
+
 class ProjectDeleteView(DeleteView):
     model = Project
     template_name = 'delete-project.html'

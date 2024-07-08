@@ -5,7 +5,8 @@
        <span class="navbar-toggler-icon"></span>
        </button>
        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            {% if user.is_authenticated %}
             <li class="nav-item">
                <a class="nav-link" href="{% url 'projects' %}">Projects </a>
             </li>
@@ -21,10 +22,15 @@
             </li>
          </ul>
       </div>
-      <a class="btn btn-primary" href="" role="button">Sign Up</a>
-      <a class="btn btn-primary" href="" role="button">Login</a>
-      {% if request.user.is_superuser %}
-         <a class="btn btn-primary" href="http://127.0.0.1:8000/admin" role="button">Admin</a>
+      
+         {% if request.user.is_superuser %}
+            <a class="btn btn-primary" href="http://127.0.0.1:8000/admin" role="button">Admin</a>
+         {% endif %}
+         <a class="btn btn-primary" href="{% url 'update-profile' %}" role="button">Profile</a>
+         <a class="btn btn-primary" href="{% url 'logout' %}" role="button">Logout</a>
+      {% else %}
+         <a class="btn btn-primary" href="{% url 'register' %}" role="button">Sign Up</a>
+         <a class="btn btn-primary" href="{% url 'login' %}" role="button">Login</a>
       {% endif %}
    </div>
    </div>
